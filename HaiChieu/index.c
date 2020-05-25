@@ -1,13 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 int **array;
+
 void initArray(int n, int m)
 {
     int i = 0;
-    array = (int **)malloc(n * sizeof(int *));
+    // use 1 of 2
+    // array = (int **)malloc(n * sizeof(int *)); // sizeof(int*) = sizeof(int**) = 8
+    array = (int **)malloc(n * sizeof(int)); // sizeof(int) = 4
     for (i = 0; i < n; i++)
     {
+        // use 1 of 2
         array[i] = (int *)malloc(m * sizeof(int));
+        // array[i] = (int *)realloc((int *)(*(array + i)), m * sizeof(int));
     }
 }
 void insertValue(int n, int m)
@@ -19,42 +25,50 @@ void insertValue(int n, int m)
         {
             printf("Input a[%d,%d], a[%d,%d] = ", i, j, i, j);
             // scanf("%d", &array[i][j]);
-            scanf("%d", array[i] + j);
+            // scanf("%d", array[i] + j);
+            scanf("%d", *(array + i) + j);
         }
-        printf(" i = %d, n = %d\n", i, n);
     }
 }
 int findMax(int n, int m)
 {
     int i, j;
     int max;
-    i = j = max = 0;
+    int tmp;
+    i = j = 0;
+    max = -99999;
     for (i = 0; i < n; i++)
+    {
         for (j = 0; j < m; j++)
         {
-
+            // tmp = **(array + (i * m + j)); // 1 3 coredump
+            // tmp = *(*array + (i * m + j)); //  1 2 0 0
+            tmp = *(*(array + i) + j);
+            // tmp = *(array[i] + j);
+            // tmp = array[i][j];
+            if (tmp > max)
             {
-                if (array[i][j] > max)
-                {
-                    max = array[i][j];
-                }
+                max = tmp;
             }
         }
+    }
     return max;
 }
 int findSum(int n, int m)
 {
     int i, j;
-    int sum;
+    int sum, tmp;
     i = j = sum = 0;
     for (i = 0; i < n; i++)
     {
         for (j = 0; j < m; j++)
         {
-
-            if (array[i][j] % 2 == 0)
+            tmp = *(*(array + i) + j);
+            // tmp = *(array[i] + j);
+            // tmp = array[i][j];
+            if (tmp % 2 == 0)
             {
-                sum += array[i][j];
+                sum += tmp;
             }
         }
     }
